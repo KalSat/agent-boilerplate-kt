@@ -10,25 +10,27 @@ import ai.koog.prompt.llm.LLModel
 val baseLlmModel = LLModel(
     provider = LLMProvider.OpenAI,
     id = Config.model,
-    capabilities =
-        listOf(
-            LLMCapability.Temperature,
-            LLMCapability.Schema.JSON.Standard,
-            LLMCapability.Tools,
-            LLMCapability.Thinking,
-        ),
+    capabilities = listOf(
+        LLMCapability.Temperature,
+        LLMCapability.Schema.JSON.Standard,
+        LLMCapability.Tools,
+        LLMCapability.Thinking,
+        LLMCapability.Completion,
+        LLMCapability.OpenAIEndpoint.Completions,
+    ),
 )
 
 val smallFastLlmModel = LLModel(
     provider = LLMProvider.OpenAI,
     id = Config.smallFastModel,
-    capabilities =
-        listOf(
-            LLMCapability.Temperature,
-            LLMCapability.Schema.JSON.Standard,
-            LLMCapability.Tools,
-            LLMCapability.Thinking,
-        ),
+    capabilities = listOf(
+        LLMCapability.Temperature,
+        LLMCapability.Schema.JSON.Standard,
+        LLMCapability.Tools,
+        LLMCapability.Thinking,
+        LLMCapability.Completion,
+        LLMCapability.OpenAIEndpoint.Completions,
+    ),
 )
 
 val llmClient = OpenAILLMClient(
@@ -36,6 +38,7 @@ val llmClient = OpenAILLMClient(
     settings = OpenAIClientSettings(baseUrl = Config.baseUrl),
 )
 
-val promptExecutor = PromptExecutor.builder()
+val promptExecutor = PromptExecutor
+    .builder()
     .addClient(llmClient)
     .build()

@@ -1,9 +1,14 @@
 plugins {
     kotlin("jvm") version "2.3.21"
+    application
 }
 
 group = "ai.inspire"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClass.set("ai.inspire.MainKt")
+}
 
 kotlin {
     jvmToolchain(17)
@@ -19,4 +24,8 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.17")
 
     testImplementation(kotlin("test"))
+}
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
