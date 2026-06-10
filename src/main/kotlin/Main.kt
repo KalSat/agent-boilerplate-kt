@@ -1,9 +1,8 @@
 package ai.inspire
 
+import ai.inspire.features.calculator.testCalculator
 import ai.inspire.features.chatbot.testChatbot
 import ai.inspire.features.structuredoutput.testStructuredOutput
-
-suspend fun testCalculator() = println("计算器 (工具调用) - 待实现")
 
 val options: List<Pair<String, suspend () -> Unit>> = listOf(
     "聊天机器人 (流式输出)" to ::testChatbot,
