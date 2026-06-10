@@ -8,6 +8,10 @@ import ai.koog.prompt.executor.clients.openai.base.models.ReasoningEffort
 import ai.koog.prompt.executor.model.StructureFixingParser
 import ai.koog.prompt.executor.model.executeStructured
 import ai.koog.prompt.params.additionalPropertiesOf
+import ai.koog.prompt.structure.StructuredRequest
+import ai.koog.prompt.structure.StructuredRequestConfig
+import ai.koog.prompt.structure.json.JsonStructure
+import ai.koog.prompt.structure.json.generator.StandardJsonSchemaGenerator
 
 suspend fun testStructuredOutput() {
     val structuredResponse = promptExecutor.executeStructured<Movie>(
@@ -28,18 +32,15 @@ suspend fun testStructuredOutput() {
         // Define the main model that will execute the request
         model = smallFastLlmModel,
         // Optional: provide examples to help the model understand the format
-        examples = listOf(
-            Movie(
-                title = "星际穿越",
-                year = 2010,
-                director = "克里斯托弗·诺兰",
-                rating = 9.4f,
-            ),
-            Movie(
-                title = "霸王别姬",
-                year = 1993,
-                director = "陈凯歌",
-                rating = 9.6f,
+        config = StructuredRequestConfig(
+            default = StructuredRequest.Manual(
+                JsonStructure.create<Movie>(
+                    schemaGenerator = StandardJsonSchemaGenerator,
+                    examples = listOf(
+                        Movie("星际穿越", 2010, "克里斯托弗·诺兰", 9.4f),
+                        Movie("霸王别姬", 1993, "陈凯歌", 9.6f),
+                    ),
+                ),
             ),
         ),
         // Optional: provide a fixing parser for error correction
