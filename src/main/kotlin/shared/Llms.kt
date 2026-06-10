@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package ai.inspire.shared
 
 import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
@@ -26,7 +28,7 @@ val smallFastLlmModel = LLModel(
     capabilities = listOf(
         LLMCapability.Temperature,
         LLMCapability.Schema.JSON.Standard,
-        LLMCapability.Tools,
+//        LLMCapability.Tools,
         LLMCapability.Thinking,
         LLMCapability.Completion,
         LLMCapability.OpenAIEndpoint.Completions,
@@ -34,8 +36,8 @@ val smallFastLlmModel = LLModel(
 )
 
 val llmClient = OpenAILLMClient(
-    apiKey = Config.apiKey,
     settings = OpenAIClientSettings(baseUrl = Config.baseUrl),
+    httpClient = createHttpClient(Config.baseUrl, Config.apiKey),
 )
 
 val promptExecutor = PromptExecutor

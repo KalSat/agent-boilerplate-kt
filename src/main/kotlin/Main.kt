@@ -1,18 +1,17 @@
 package ai.inspire
 
 import ai.inspire.features.chatbot.testChatbot
+import ai.inspire.features.structuredoutput.testStructuredOutput
 
-fun testStructuredOutput() = println("电影推荐 (结构化输出) - 待实现")
+suspend fun testCalculator() = println("计算器 (工具调用) - 待实现")
 
-fun testCalculator() = println("计算器 (工具调用) - 待实现")
-
-val options: List<Pair<String, () -> Unit>> = listOf(
+val options: List<Pair<String, suspend () -> Unit>> = listOf(
     "聊天机器人 (流式输出)" to ::testChatbot,
     "电影推荐 (结构化输出)" to ::testStructuredOutput,
     "计算器 (工具调用)" to ::testCalculator,
 )
 
-fun main() {
+suspend fun main() {
     println("Select an option by number:")
     options.forEachIndexed { idx, option ->
         println("${idx + 1}. ${option.first}")
