@@ -4,14 +4,17 @@ package ai.inspire.shared
 
 import ai.koog.http.client.ktor.KtorKoogHttpClient
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.HttpRequestPipeline
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.content.TextContent
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -25,6 +28,16 @@ private val koogClientFactory = KtorKoogHttpClient.Factory(
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.ALL
+        }
+
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    ignoreUnknownKeys = true // 核心修复：遇到不认识的字段直接忽略，不要报错
+                    isLenient = true // 宽容模式
+                    encodeDefaults = true // 编码默认值
+                },
+            )
         }
     },
 )
@@ -41,6 +54,10 @@ fun createHttpClient(
         ).also {
             // 拦截 Ktor 的渲染阶段（此时对象已被 ContentNegotiation 转为 JSON 文本）
             it.ktorClient.requestPipeline.intercept(HttpRequestPipeline.Render) { payload ->
+                // 强行清理并重写 Accept header
+                context.headers.remove(HttpHeaders.Accept)
+                context.headers.append(HttpHeaders.Accept, "application/json")
+
                 // 仅拦截声明了 application/json 且内容为 TextContent 的请求
                 if (payload !is OutgoingContent ||
                     payload.contentType?.match(ContentType.Application.Json) != true

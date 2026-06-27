@@ -12,6 +12,9 @@ import ai.koog.prompt.structure.StructuredRequest
 import ai.koog.prompt.structure.StructuredRequestConfig
 import ai.koog.prompt.structure.json.JsonStructure
 import ai.koog.prompt.structure.json.generator.StandardJsonSchemaGenerator
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 suspend fun testStructuredOutput() {
     val structuredResponse = promptExecutor.executeStructured<Movie>(
@@ -53,6 +56,6 @@ suspend fun testStructuredOutput() {
         val movie = structuredResponse.getOrThrow()
         println("$movie")
     } else {
-        println("获取电影推荐失败: ${structuredResponse.exceptionOrNull()?.message}")
+        logger.error { "获取电影推荐失败: ${structuredResponse.exceptionOrNull()?.message}" }
     }
 }

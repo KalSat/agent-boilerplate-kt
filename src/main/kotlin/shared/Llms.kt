@@ -28,7 +28,7 @@ val smallFastLlmModel = LLModel(
     capabilities = listOf(
         LLMCapability.Temperature,
         LLMCapability.Schema.JSON.Standard,
-//        LLMCapability.Tools,
+        LLMCapability.Tools,
         LLMCapability.Thinking,
         LLMCapability.Completion,
         LLMCapability.OpenAIEndpoint.Completions,
@@ -36,7 +36,14 @@ val smallFastLlmModel = LLModel(
 )
 
 val llmClient = OpenAILLMClient(
-    settings = OpenAIClientSettings(baseUrl = Config.baseUrl),
+    settings = OpenAIClientSettings(
+        baseUrl = Config.baseUrl,
+        chatCompletionsPath = "chat/completions",
+        responsesAPIPath = "responses",
+        embeddingsPath = "embeddings",
+        moderationsPath = "moderations",
+        modelsPath = "models",
+    ),
     httpClient = createHttpClient(Config.baseUrl, Config.apiKey),
 )
 

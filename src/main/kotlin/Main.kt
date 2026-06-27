@@ -2,12 +2,14 @@ package ai.inspire
 
 import ai.inspire.features.calculator.testCalculator
 import ai.inspire.features.chatbot.testChatbot
+import ai.inspire.features.chess.testChess
 import ai.inspire.features.structuredoutput.testStructuredOutput
 
 val options: List<Pair<String, suspend () -> Unit>> = listOf(
     "聊天机器人 (流式输出)" to ::testChatbot,
     "电影推荐 (结构化输出)" to ::testStructuredOutput,
     "计算器 (工具调用)" to ::testCalculator,
+    "中国象棋 (工具调用)" to ::testChess,
 )
 
 suspend fun main() {
