@@ -11,6 +11,7 @@ import ai.koog.agents.core.dsl.extension.nodeLLMRequest
 import ai.koog.agents.core.dsl.extension.nodeLLMSendToolResults
 import ai.koog.agents.core.dsl.extension.onTextMessage
 import ai.koog.agents.core.dsl.extension.onToolCalls
+import ai.koog.agents.core.environment.ToolResultKind
 
 /**
  * 中国象棋 Agent 策略
@@ -38,8 +39,36 @@ val chessStrategy = strategy<String, String>("chess_strategy") {
     edge(nodeStart forwardTo nodeCallLLM)
     edge(nodeCallLLM forwardTo nodeExecuteTool onToolCalls { true })
     edge(nodeCallLLM forwardTo nodeFinish onTextMessage { true })
-    edge(nodeExecuteTool forwardTo nodeTrimHistory)
+
+    // 走子成功 → 直接结束本轮，节省一次 LLM 调用
+    edge(
+        (nodeExecuteTool forwardTo nodeFinish)
+            .onCondition { results: ReceivedToolResults ->
+                results.toolResults.all { it.resultKind is ToolResultKind.Success }
+            }.transformed { results ->
+                results.toolResults.joinToString("\n") { it.output }
+            },
+    )
+
+    // 走子失败 → 裁剪历史 → 回传 LLM 纠错重试
+    edge(
+        (nodeExecuteTool forwardTo nodeTrimHistory)
+            .onCondition { results: ReceivedToolResults ->
+                results.toolResults.any { it.resultKind !is ToolResultKind.Success }
+            },
+    )
+
     edge(nodeTrimHistory forwardTo nodeSendToolResult)
     edge(nodeSendToolResult forwardTo nodeFinish onTextMessage { true })
     edge(nodeSendToolResult forwardTo nodeExecuteTool onToolCalls { true })
+
+    /*
+    Start → CallLLM → ExecuteTool ──成功──→ Finish
+                      │
+                    失败
+                      ↓
+                TrimHistory → SendResult → Finish
+                                 │
+                           (若再次工具调用) → ExecuteTool
+     */
 }
